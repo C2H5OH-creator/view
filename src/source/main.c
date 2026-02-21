@@ -20,16 +20,16 @@ int main(int argc, char *argv[]) {
     if (rc != 0) return 1;
 
     file_info info = check_file_type(opts.path);
-    if (opts.verbose) {
+    if (opts.verbose && !opts.info_mode) {
         print_file_info(&info);
     }
 
-    if (info.error_code != 0) {
+    if (!opts.force_jpeg && info.error_code != 0) {
         fprintf(stderr, "Ошибка обработки файла (code=%d)\n", info.error_code);
         return 1;
     }
 
-    if (!(info.file_type != NULL && strcmp(info.file_type, "jpeg") == 0)) {
+    if (!opts.force_jpeg && !(info.file_type != NULL && strcmp(info.file_type, "jpeg") == 0)) {
         printf("Файл — не JPEG. Его поддержки пока нет\n");
         return 1;
     }
@@ -45,13 +45,23 @@ int main(int argc, char *argv[]) {
     fclose(f);
 
     if (err != PARSE_OK) {
-        fprintf(stderr, "JPEG parse error: %d\n", err);
-        return 1;
+        if (!opts.force_jpeg) {
+            fprintf(stderr, "JPEG parse error: %d\n", err);
+            return 1;
+        }
+        fprintf(stderr, "JPEG parse error: %d (forced mode: trying decode anyway)\n", err);
     }
 
     if (opts.info_mode) {
-        printf("JPEG: %dx%d, components=%d, precision=%d, SOF=0x%X\n",
-               ji.width, ji.height, ji.components, ji.precision, ji.sof_marker);
+        print_file_info(&info);
+        print_file_metadata(opts.path);
+        if (err == PARSE_OK) {
+            printf("JPEG: %dx%d, components=%d, precision=%d, SOF=0x%X\n",
+                   ji.width, ji.height, ji.components, ji.precision, ji.sof_marker);
+        } else {
+            printf("JPEG parser: failed with code=%d (forced mode active)\n", err);
+        }
+        return 0;
     }
 
     unsigned char *rgb = NULL;

@@ -30,6 +30,7 @@ typedef struct {
 typedef struct {
     int verbose;
     int info_mode;
+    int force_jpeg;
     const char *path;
 } AppOptions;
 

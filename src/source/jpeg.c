@@ -55,7 +55,7 @@ static const char *marker_name(uint8_t marker) {
     }
 }
 
-static ParseError scan_entropy_until_eoi(FILE *f, const JpegInfo *out, int verbose) {
+static ParseError scan_entropy_until_marker(FILE *f, uint8_t *next_marker, int verbose) {
     uint8_t b;
     while (1) {
         if (read_u8(f, &b)) return PARSE_IO;
@@ -70,17 +70,16 @@ static ParseError scan_entropy_until_eoi(FILE *f, const JpegInfo *out, int verbo
             continue;
         }
 
-        if (marker == 0xD9) {
-            if (verbose) printf("[jpeg] marker 0xFF%02X (%s)\n", marker, marker_name(marker));
-            return (out->width > 0 && out->height > 0) ? PARSE_OK : PARSE_BAD_FORMAT;
-        }
-
         if (marker >= 0xD0 && marker <= 0xD7) {
             if (verbose) printf("[jpeg] marker 0xFF%02X (RST)\n", marker);
             continue;
         }
 
-        return PARSE_BAD_FORMAT;
+        if (verbose) {
+            printf("[jpeg] marker 0xFF%02X (%s)\n", marker, marker_name(marker));
+        }
+        *next_marker = marker;
+        return PARSE_OK;
     }
 }
 
@@ -96,16 +95,22 @@ ParseError parse_jpeg(FILE *f, JpegInfo *out, int verbose) {
     out->precision = 0;
     out->sof_marker = -1;
 
+    uint8_t marker = 0;
+    int have_marker = 0;
+
     while (1) {
-        uint8_t ff, marker;
+        if (!have_marker) {
+            uint8_t ff;
+            do {
+                if (read_u8(f, &ff)) return PARSE_IO;
+            } while (ff != 0xFF);
 
-        do {
-            if (read_u8(f, &ff)) return PARSE_IO;
-        } while (ff != 0xFF);
-
-        do {
-            if (read_u8(f, &marker)) return PARSE_IO;
-        } while (marker == 0xFF);
+            do {
+                if (read_u8(f, &marker)) return PARSE_IO;
+            } while (marker == 0xFF);
+        } else {
+            have_marker = 0;
+        }
 
         if (marker == 0xD9) {
             if (verbose) printf("[jpeg] marker 0xFF%02X (%s)\n", marker, marker_name(marker));
@@ -128,7 +133,9 @@ ParseError parse_jpeg(FILE *f, JpegInfo *out, int verbose) {
 
         if (marker == 0xDA) {
             if (payload > 0 && skip_n(f, payload)) return PARSE_IO;
-            return scan_entropy_until_eoi(f, out, verbose);
+            if (scan_entropy_until_marker(f, &marker, verbose) != PARSE_OK) return PARSE_IO;
+            have_marker = 1;
+            continue;
         }
 
         if (is_sof_marker(marker)) {
