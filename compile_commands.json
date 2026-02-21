@@ -1,0 +1,82 @@
+[
+  {
+    "file": "src/source/jpeg.c",
+    "arguments": [
+      "gcc",
+      "-Isrc/include",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "src/source/jpeg.c",
+      "-o",
+      "bin/view",
+      "-I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT"
+    ],
+    "directory": "/home/c2h5oh/dev/projects/view",
+    "output": "bin/view"
+  },
+  {
+    "file": "src/source/file_info.c",
+    "arguments": [
+      "gcc",
+      "-Isrc/include",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "src/source/file_info.c",
+      "-o",
+      "bin/view",
+      "-I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT"
+    ],
+    "directory": "/home/c2h5oh/dev/projects/view",
+    "output": "bin/view"
+  },
+  {
+    "file": "src/source/window.c",
+    "arguments": [
+      "gcc",
+      "-Isrc/include",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "src/source/window.c",
+      "-o",
+      "bin/view",
+      "-I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT"
+    ],
+    "directory": "/home/c2h5oh/dev/projects/view",
+    "output": "bin/view"
+  },
+  {
+    "file": "src/source/main.c",
+    "arguments": [
+      "gcc",
+      "-Isrc/include",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "src/source/main.c",
+      "-o",
+      "bin/view",
+      "-I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT"
+    ],
+    "directory": "/home/c2h5oh/dev/projects/view",
+    "output": "bin/view"
+  },
+  {
+    "file": "src/source/args.c",
+    "arguments": [
+      "gcc",
+      "-Isrc/include",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "src/source/args.c",
+      "-o",
+      "bin/view",
+      "-I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT"
+    ],
+    "directory": "/home/c2h5oh/dev/projects/view",
+    "output": "bin/view"
+  }
+]
